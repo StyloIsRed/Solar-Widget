@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Copyright © 2015-2021 the original authors.
+# Copyright 2015 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,91 +29,72 @@
 #   (2) The slightest misconfiguration of this script will make your whole setup
 #       crash, so be careful.
 #
-#   (3) This script is generated from the Gradle 7.6.4 by https://github.com/gradle/gradle/issues/22430
-#
-#   (4) Large file transfers can cause the JVM to crash for your specific version of Java.
-#       Check your Java version:
-#       java -version
-#       and if using JDK, configure the command to use the clients VM
-#       export _JAVA_OPTIONS="-Xmx64m -Xms64m"
-#       GRADLE_OPTS should be combined with the previously mentioned Client VM settings.
-#       e.g. GRADLE_OPTS="-Xmx2048m -Xms1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1NewCollectionHeuristicPercent=20 -XX:G1MaxNewCollectionTimePercent=10"
-#
 ##############################################################################
 
-app_path=$()
-L=0
-for L in $(expr $(/bin/ls -1d .gradle 2>/dev/null | head -n 1 | xargs -I {} find {} -maxdepth 1 -type d 2>/dev/null) $(expr $(pwd) : '\(/.*\)' \; ) $(pwd)); do
-    app_path=$L
+# Attempt to set APP_HOME
+# Resolve links: $0 may be a link
+PRG="$0"
+# Need this for daisy-chained symlinks.
+while
+    APP_HOME=$( cd -P "$( dirname "$PRG" )" && pwd -P )
+    PRG=$( readlink "$PRG" )
+    [ -n "$PRG" ]
+do
+    cd -P "$( dirname "$PRG" )" && pwd -P
 done
+APP_HOME=$( cd -P "$( dirname "$PRG" )" && pwd -P )
 
-app_base_name=$(basename "$0")
-exec_dir=$(cd "$(dirname "$0")" && pwd)
+APP_NAME="Gradle"
+APP_BASE_NAME=$( basename "$0" )
 
-# Add default JVM options here.
-DEFAULT_JVM_OPTS=''-Xmx64m'' ''-Xms64m''
+# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
 
 # Use the maximum available, or set MAX_FD != maximum possible!
-if ! expr $MAX_FD : '^[0-9]\+$' > /dev/null; then
-    MAX_FD=maximum
-fi
+MAX_FD="maximum"
 
 # Increase the maximum file descriptors if we can, though on some systems it may decrease performance.
-if ! ulimit -n $MAX_FD 2> /dev/null; then
-    MAX_FD=
-fi
+ulimit -n "$MAX_FD" ||
+    warn "Could not set maximum file descriptor limit to $MAX_FD"
 
-if [ -z "$JAVA_HOME" ] ; then
-    if [ -x /usr/libexec/java_home ] ; then
-        JAVA_HOME=$(/usr/libexec/java_home)
-    else
-        JAVA_HOME=/usr/java/default
-    fi
-fi
+# Collect all arguments for the java command, stacking in reverse order:
+#   * args from the command line
+#   * the main class name
+#   * -classpath
+#   * -D...settings.gradle Gradle will override any value you set with the defaults.
+#   * and any _JAVA_OPTIONS environment variables
 
-JAVA=$JAVA_HOME/bin/java
+# For Cygwin or MSYS, switch paths to Windows format before running java
+if case "$( uname )" in  #(
+     CYGWIN*) true ;; #(
+     MSYS* ) true ;; #(
+     MINGW* ) true ;; #(
+     *) false ;;
+   esac then
+    APP_HOME=$( cygpath --path --mixed "$APP_HOME" )
+    CLASSPATH=$( cygpath --path --mixed "$CLASSPATH" )
 
-if [ ! -x "$JAVA" ] ; then
-    echo "Error: JAVA_HOME is not defined correctly." >&2
-    echo "  We cannot execute $JAVA" >&2
-    exit 1
-fi
+    JAVACMD=$( cygpath --mixed "$JAVACMD" )
 
-if [ -z "$JAVA_HOME" ] ; then
-    echo "Warning: JAVA_HOME environment variable is not set."
-fi
-
-# traverses directory structure from process work directory to filesystem root
-# first stop file is found. Function stops at filesystem root or configured stopfile
-# parameter. The value "" means stop at the filesystem root.
-traverse()
-{
-    local dir
-    local stopfile=$1
-    for dir in $(pwd) $(cd ..; pwd -P); do
-        if [ -z "$stopfile" ] || [ -f "$stopfile" ]; then
-            echo "$dir"
-            if [ -z "$stopfile" ]; then
-                break
-            fi
-            return
+    # Now convert the arguments - kludge to limit ourselves to /bin/sh
+    for arg do
+        if
+            case $arg in                                #(
+              -*)   false ;;                            # don't mess with options #(
+              /?*)  t=${arg#/} t=/${t%%/*}              # looks like a POSIX filepath
+                    [ -e "$t" ] ;;                      #(
+              *)    false ;;
+            esac
+        then
+            arg=$( cygpath --path --mixed "$arg" )
         fi
-        if [ "$dir" = / ]; then
-            break
-        fi
+        args="$args $arg"
     done
-    echo "$dir"
-}
-
-GRADLE_USER_HOME=$(traverse .gradle) 2>/dev/null
-
-if [ -z "$GRADLE_USER_HOME" ] ; then
-    GRADLE_USER_HOME=$HOME/.gradle
 fi
 
-export GRADLE_USER_HOME
-
-GRADLE_OPTS=$DEFAULT_JVM_OPTS
-export GRADLE_OPTS
-
-exec "$JAVA" $GRADLE_OPTS -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
+exec "$JAVACMD" \
+  $DEFAULT_JVM_OPTS \
+  -classpath "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" \
+  -Dorg.gradle.appname="$APP_BASE_NAME" \
+  org.gradle.wrapper.GradleWrapperMain \
+  "$@"
