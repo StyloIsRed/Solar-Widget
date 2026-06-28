@@ -23,15 +23,7 @@ APP_NAME="Gradle"
 APP_BASE_NAME=$(basename "$0")
 
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
-DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
-
-# Use the maximum available, or set MAX_FD != maximum possible!
-MAX_FD="maximum"
-
-# Increase the maximum file descriptors if we can, though on some systems it may decrease performance.
-if [ "$MAX_FD" != "maximum" ]; then
-    ulimit -n "$MAX_FD" || MAX_FD="unlimited"
-fi
+DEFAULT_JVM_OPTS="-Xmx64m -Xms64m"
 
 # For Cygwin or MSYS, switch paths to Windows format before running java
 case "$( uname )" in
