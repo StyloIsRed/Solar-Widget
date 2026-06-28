@@ -19,7 +19,7 @@ jobs:
         cache: gradle
 
     - name: Make gradlew executable
-      chmod +x ./gradlew
+      run: chmod +x ./gradlew
 
     - name: Build APK
       run: ./gradlew assembleDebug
